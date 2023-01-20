@@ -3,14 +3,15 @@
 #include <BH1750.h>
 #include <Wire.h>
 #include <ArduinoJson.h>
-#include <SimpleDHT.h>
+#include "DHT.h"
 
-#define APIKEY  "Ax3bO9E449RPlqPuRExiRkuygLHWkmT7"                        //replace API key
-#define DEVICE_DEV_ID "deviceDefault@ldidil"      //replace device developer id
+#define APIKEY  ""                        //replace API key
+#define DEVICE_DEV_ID ""      //replace device developer id
+#define DHTTYPE DHT11
 
 
-const int SEN_PIN = 4;                               // Output Pin GPIO19
-SimpleDHT11 dht22(SEN_PIN);
+const int DHTPIN  = 4;                               // Output Pin GPIO19
+DHT dht(DHTPIN, DHTTYPE);
 HTTPClient http;
 
 
@@ -19,8 +20,8 @@ BH1750 lightMeter;
 //water level meter RDSM01
 const int potPin = 34;
 
-const char ssid[] = "modem";                 //replace wifi SSID 
-const char password[] = "Admin4317";         //replace wifi password 
+const char ssid[] = "";                 //replace wifi SSID 
+const char password[] = "";         //replace wifi password 
 
 float temperature = 0;
 float humidity = 0;
@@ -48,6 +49,11 @@ void sendData(String body)
 }
 
 
+float readWaterLvl(){
+  return 100-map(analogRead(potPin), 0, 4096, 0, 100);
+}
+
+
 void setup()
 {
   Serial.begin(921600);
@@ -65,6 +71,8 @@ void setup()
   Serial.print("IP Address: ");
   Serial.println(WiFi.localIP());
 
+  //dht
+  dht.begin();
   //swiatlo
   Wire.begin();
   lightMeter.begin();
@@ -75,15 +83,11 @@ void setup()
 void loop()
 {
   if (millis() - previousMillis > interval) {
-    int err = SimpleDHTErrSuccess;
-    if ((err = dht22.read2(&temperature, &humidity, NULL)) != SimpleDHTErrSuccess) {
-      Serial.print("Read DHT22 failed, err="); Serial.println(err);
-      delay(1000);
-      return;
-    }
+    humidity = dht.readHumidity();
+    temperature = dht.readTemperature();
   
     float lightLvl = lightMeter.readLightLevel();
-    int waterLvlValue = analogRead(potPin);
+    int waterLvlValue = readWaterLvl();
     Serial.print("Sample OK: ");
     Serial.print((float)temperature);
     Serial.print(" *C, ");

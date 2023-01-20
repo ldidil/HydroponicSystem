@@ -1,5 +1,8 @@
 {
   "files.associations": {
-    "tmp": "cpp"
+    "tmp": "cpp",
+    "array": "cpp",
+    "string": "cpp",
+    "string_view": "cpp"
   }
 }
