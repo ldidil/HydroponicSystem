@@ -4,7 +4,7 @@
       <img class="water" alt="pHLvl" src="../assets/water/phLow.png" />
       <p>pH : Too low</p>
     </div>
-    <div v-if="pHLvl > 5 && pHLvl < 7">
+    <div v-if="pHLvl >= 5 && pHLvl <= 7">
       <img class="water" alt="pHLvl" src="../assets/water/phOpt.png" />
       <p>pH: Optimum</p>
     </div>

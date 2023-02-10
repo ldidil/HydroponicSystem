@@ -1,16 +1,19 @@
 <template>
   <div class="data" v-if="results">
-    <p>Temperature: {{ results.temperature }}°C</p>
-    <p>Humidity: {{ results.humidity }}%</p>
+    <h3>Temperature: {{ results.temperature }}°C</h3>
+    <h3>Humidity: {{ results.humidity }}%</h3>
     <div class="circle">
       <lightLvlComponent class="box" :lighLvl="results.lightLvl" />
       <waterLvlComponent class="box" :waterLvl="results.waterLvl" />
-      <phLvlComponent class="box" :pHLvl="9" />
-      <ppmLvlComponent class="box" :ppmValue="700" />
+      <phLvlComponent class="box" :pHLvl="results.phValue" />
+      <ppmLvlComponent class="box" :ppmValue="results.tdsValue" />
     </div>
     <div class="dataTime">
       <img alt="Flower" src="../assets/flower.png" />
-      <p>{{ datatime }}</p>
+      <p>
+        Data from :
+        {{ formatDate(datatime) }}
+      </p>
     </div>
   </div>
 </template>
@@ -21,10 +24,13 @@ import lightLvlComponent from "./LightLvl.vue";
 import waterLvlComponent from "./WaterLvl.vue";
 import phLvlComponent from "./PHLvl.vue";
 import ppmLvlComponent from "./PPMValue.vue";
-const url = ""; //url
+import dayjs from "dayjs";
+
+const url = "http://localhost:8080/v2/devices/esp32@ldidil/streams";
 const config = {
   headers: {
-    apikey: "", //APIKEY
+    apikey:
+      "eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJ1c2VybmFtZSI6ImxkaWRpbCIsInJlYWRfd3JpdGUiOmZhbHNlLCJpYXQiOjE2NjgwOTg2MTN9.uUBC8Q-bKV0phQusFd9OeTAYqvvgDviBgVACKKTJ0JA",
     "Access-Control-Allow-Origin": "*",
     "content-type": "application/json",
     "cache-control": "no-cache",
@@ -50,12 +56,18 @@ export default {
       this.datatime = response.data.results[0].stream_created_at;
     });
   },
+  methods: {
+    formatDate(dateString) {
+      const date = dayjs(dateString);
+      return date.format("D MMM YYYY, H:mm");
+    },
+  },
 };
 </script>
 
 <style>
-.h2 {
-  font-weight: lighter;
+h3 {
+  font-weight: normal;
 }
 .box {
   margin: 40px;
@@ -67,10 +79,5 @@ export default {
   margin: 20px;
   align-items: center;
   justify-content: center;
-}
-
-.dataTime {
-  margin: 30px;
-  font-size: 15px;
 }
 </style>
